@@ -117,14 +117,16 @@ Also, with this coding standard, a code reviewer is more likely to flag this for
 ### Embed documentation in the code
 Most readers wont make it to a separate document, so to the extent possible embed documentation within the code. 
 
-* Good comments should be succinct and clear, focusing on _why_ some operation is being done
+* Good comments should be succinct and clear, focusing on _why_ some operation is being done not _how_ it was implemented.
 * In the code examples linked above you'll note both longer documentation blocks describing the "big picture" (of either the code file or some segment of that file) and shorter documentation lines that describe specific steps.
 * Long derivations and data descriptions may need to be in a separate document - keep those documents as close to the code as possible (e.g. in the same repository), but that doesn't eliminate the need for documentation within the code and embed permanent links (relative or absolute) to these documents if possible.
+
+*Often, your comments will be read more than your code.*
 
 ### Document design and purpose not mechanics
 Good documentation is meant to help readers understand the code. Describe what a function is doing and write down reasons for key design decisions.
 
-If you find yourself writing a long text describing the operation of a piece of code consider breaking that code up into smaller, more understandable pieces.
+If you find yourself writing a long text describing the operation of a piece of code consider breaking that code up into smaller, more understandable pieces, using clearer variable names, or re-thinking your approach.
 
 * This makes the code easier to understand
 * This also will help avoid errors and problems buried in the middle of a complex calculation; better to "show your work" and break it into smaller pieces.
@@ -197,6 +199,11 @@ One common problem is embedding a number, such as a year or number of items, wit
 
 A corollary to this is that if a (non-constant) data item is changed as a result of a calculation, make sure the code and data are structured in a way that this change will be consistently available wherever this data item will subsequently be needed throughout the system.
 > If this is not the case, then a re-design is likely necessary.
+
+#### Think in terms of functions
+Modular code generally consists of sets of functions. Functions take one or more inputs (arguments), and return one or more results. If you can break your task down to a set of specific functions your code will be more robust and understandable.
+
+Functions should be [Pure Functions](https://en.wikipedia.org/wiki/Pure_function) as much as possible. While it can seem easier, at first, to modify variables that are outside of the function's scope (e.g. using global variables), this can lead to unintended side-effects and make bugs difficult to catch.
 
 #### Re-use functions instead of copying code
 If you find yourself copying a chunk of code block from one place to another, this may be a good occasion to create a function that performs those operations.
