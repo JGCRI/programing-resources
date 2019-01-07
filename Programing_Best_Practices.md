@@ -129,11 +129,31 @@ If you find yourself writing a long text describing the operation of a piece of 
 * This makes the code easier to understand
 * This also will help avoid errors and problems buried in the middle of a complex calculation; better to "show your work" and break it into smaller pieces.
 
+### Document your data structures
+> Show me your flowcharts and conceal your tables, and I shall continue to be mystified. Show me your tables, 
+> and I won’t usually need your flowcharts; they’ll be obvious.
+
+<span style="text-align: right"> --Frederick Brooks, <em>The Mythical Man-Month</em></span>
+
+The logic behind your algorithms is exposed in the sequence of statements in your program.  Not so, the layout of your
+data structures.  At best, the person reading your code can infer them from the code that creates the structures; 
+however, this code is likely to be far removed from the place where the structures are used, and it may not be gathered
+together all in one place.  At worst, if the data structures are read in from files or generated in another package, 
+there may be _no_ way, short of inspecting them in a debugging session, to decipher them.  Therefore, always describe 
+the format and layout of data structures that are being passed into or returned from a function, or read or written
+to an external source.
+
+* **Bad**: `:param T:  Temperature values` (The reader has no idea how the temperatures are organized.)
+* **Better**: `:param T: Matrix of temperature values` (At least now we know it's a matrix.)
+* **Best**: `:param T: Matrix[ntime, ngrid] of temperature values, time steps in rows, grid cells in columns.` 
+(This time we know not only that it's a matrix, but how it's organized.  We could readily create or use such a structure.)
+
 ### Document purpose of functions and function arguments
-The purpose of any function/sub-routine should be documented along with a description of all arguments. Do this **as you write the function** so you are clear as to what you writing this function for!
+The purpose of any function/sub-routine should be documented along with a description of all arguments. Do this **before you write the function** so you are clear as to what you writing this function for!
 
 * Describe any limits on valid values for arguments
 * Describe use of any optional parameters
+
 
 
 ### Consider use of a documentation generator
