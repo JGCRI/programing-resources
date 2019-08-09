@@ -124,6 +124,8 @@ Most readers wont make it to a separate document, so to the extent possible embe
 *Often, your comments will be read more than your code.*
 
 ### Document design and purpose not mechanics
+Another way to say this is *document why, not how*.
+
 Good documentation is meant to help readers understand the code. Describe what a function is doing and write down reasons for key design decisions.
 
 If you find yourself writing a long text describing the operation of a piece of code consider breaking that code up into smaller, more understandable pieces, using clearer variable names, or re-thinking your approach.
@@ -157,11 +159,8 @@ The purpose of any function/sub-routine should be documented along with a descri
 * Describe use of any optional parameters
 
 
-
 ### Consider use of a documentation generator
-Programs such as Doxygen, Javadoc, etc. extract comments to generate program documentation.
-
-We've not consistently done this at JGCRI, but others have found this useful. 
+Programs such as Doxygen, Javadoc, roxygen2, etc. extract comments to generate program documentation.
 
 Even if you don't actually use the documentation generator, the documentation formats can still be useful; e.g. in GCAM use of Doxygen style comments has resulted in consistent and more fully documented code, even though we have rarely actually used the system to generate separate documentation).
 
@@ -170,6 +169,7 @@ Write documentation before and as you code, not afterward.
 
 * Documenting as you go, and before you write code segments, relieves your working memory of having to store information. 
 * Write down in comment lines what your current code block is going to accomplish, and what the next code block is going to do.
+* Update documentation (comments) if you update code. (An outdated comment can be worse than no comment at all!)
 
 ## <a name="bp-modular">5. Plan Ahead (Writing Modular code) </a>
 
@@ -226,16 +226,34 @@ Modular code generally consists of sets of functions. Functions take one or more
 Functions should be [Pure Functions](https://en.wikipedia.org/wiki/Pure_function) as much as possible. While it can seem easier, at first, to modify variables that are outside of the function's scope (e.g. using global variables), this can lead to unintended side-effects and make bugs difficult to catch.
 
 #### Re-use functions instead of copying code
-If you find yourself copying a chunk of code block from one place to another, this may be a good occasion to create a function that performs those operations.
+If you find yourself copying a chunk of code block from one place to another, this is likely an occasion to create a function that performs those operations.
 
 * If the function is well-named this also means that the functionality can be remembered (and referenced) as one single chunk (less stress on working memory)
 * This has the additional benefit that is is easier to check for argument validity and emit errors if bad values are found (see below).
 
-#### Avoid for loops and similar constructions
+#### Consider when to use loops and similar constructions
 
-Sometimes a loop is necessary, but in many higher level languages it's often not. If a loop is required, avoid hard coding limits, such as was done in our [bad code example](#bp-bad-code-example) above. Many languages allow you to identify the number of elements in a multi-dimensional variable, so use that capability. In C++, use iterators.
+Sometimes a loop is the cleanest way to write code, but there are often alternatives that can be cleaner and clearer. The [iteration chapter](https://r4ds.had.co.nz/iteration.html) of R for Data Science has a nice discussion of loops vs. functionals. Bottom line is usually, do what is clearer. 
 
-In a language such as R, functions such as `apply` and `lapply` are more efficient and powerful means of achieving what you would otherwise do in a loop. This requires you to break your operations into discrete functions, but after reading this document you now are going to do this anyway, right?
+Take advantage of functionality available in the language you are using. In R, functions such as `apply` and `lapply` can be more efficient and powerful means of achieving what you would otherwise do in a loop. This requires you to break your operations into discrete functions, but after reading this document you now are going to do this anyway, right?
+
+Consider if you can vectorize operations, which can be clearer and faster. 
+
+Some loop points:
+
+* If a loop is used, avoid hard coding limits, such as was done in our [bad code example](#bp-bad-code-example) above. Many languages allow you to identify the number of elements in a multi-dimensional variable, so use that capability. In C++, use iterators.
+* Note that in R, pre-allocating the maximum memory that will be needed by a loop can speed up code and ccan make loops more efficient.
+* Loops lend themselves well to tracking progress (e.g. via progress bars).
+* Loops can be useful for not losing all your work if only one iteration fails. (This and previous point can be accomplished with functionals, especially with the help of the purrr package in R, but it's not necessarily obvious.)
+* Loops can be essential for doing dynamic simulations where the current state depends on previous states (e.g., var(t) depends on var(t-1)).
+
+
+#### Don't always follow these *'rules'*
+
+In general, these are good principles, but everything comes at at a cost. The [*wrong* abstraction can be more costly than duplication](https://www.sandimetz.com/blog/2016/1/20/the-wrong-abstraction) as also discussed [here](https://programmingisterrible.com/post/139222674273/write-code-that-is-easy-to-delete-not-easy-to) and
+[here](https://programmingisterrible.com/post/176657481103/repeat-yourself-do-more-than-one-thing-and).
+
+If its not clear how to abstract a piece of code it's a good idea to duplicate code several times to identify how best to abstract (i.e. modularize) the code (e.g. which variables will change, what is the range of functionality you expect it to support, etc.).
 
 ## <a name="bp-errors">6. Plan for Mistakes</a>
 
@@ -305,6 +323,8 @@ When you design a function, consider if there is a known input/output relationsh
 
 Even if you don't formally incorporate unit testing into your code, the concept is still useful for code testing. Use a simplified test case to check that your code produces a reasonable result. 
 
+Unit tests can be high level or low level, or more or less stringent, depending on the case. For example, a unit test can test if a result is positive. Or if one result is larger than another. 
+
 A variant on this for code that processes complex data is to trace through from input to output a straightforward example (e.g. a sector that has only one technology, etc.).
 
 If you find a bug, turn that into a test case through use of unit testing or assertions.
@@ -348,6 +368,14 @@ Resources:
 
 [Why should I use version control?](https://stackoverflow.com/questions/1408450/why-should-i-use-version-control)
 
+### Write A Style Guide
+
+For larger projects, it is generally useful to put together a style guide. You can copy one from an existing project whose style seems to work for your project.
+
+* Style guides (including this page) are not style rules. Many style guides will specifically say that if violating one of their guidelines makes your code clearer or easier to work with, do it.
+* Many text editors can be configured to yell at you when your code breaks style rules (i.e. code "linters"; e.g. RStudio's "code diagnostics"), and that it's a good idea to have these on.
+
+
 ## <a name="bp-reinvent">8. Don't Reinvent The Wheel </a>
 
 Someone likely has encountered whatever it is you are trying to do. See if a solution is out there.
@@ -361,3 +389,8 @@ Someone likely has encountered whatever it is you are trying to do. See if a sol
  * If you modularize your code, particularly splitting actions into functions, this makes it easy to reuse that functionality in other projects. 
  * Remember, if a function starts getting to long, break it into smaller bits.
  
+## <a name="bp-end">The Bottom Line </a>
+
+Not all these techniques need to be applied to every code. If the code you have does what you need, fine.
+
+If you internalize these practicies, however, as you write new code **Future You** will thank you for making life easier when they go back to figure out what that code you wrote 5 years ago was doing.
